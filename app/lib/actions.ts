@@ -1,7 +1,6 @@
 'use server';
 
-import { signIn } from '@/auth';
-import { AuthError } from 'next-auth';
+import { signIn } from 'next-auth/react';
 import { revalidatePath } from 'next/cache';
 import { redirect } from 'next/navigation';
 import { z } from 'zod';
@@ -12,19 +11,23 @@ import { User, CategoryForm, DepartmentForm, AssetForm, UserForm } from './defin
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 // Authentication
-export async function authenticate(email: string, password: string) {
+export async function authenticate(formData: FormData) {
+  const email = formData.get('email') as string;
+  const password = formData.get('password') as string;
+
+  if (!email || !password) {
+    return { error: 'Email and password are required' };
+  }
+
   try {
-    await signIn('credentials', { email, password });
+    // In server actions, we can't use the client-side signIn function
+    // Instead, we'll redirect to the NextAuth API route
+    redirect(`/api/auth/signin/credentials?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
   } catch (error) {
-    if (error instanceof AuthError) {
-      switch (error.type) {
-        case 'CredentialsSignin':
-          return { error: 'Invalid credentials' };
-        default:
-          return { error: 'Something went wrong' };
-      }
+    if (error instanceof Error) {
+      return { error: error.message };
     }
-    throw error;
+    return { error: 'Something went wrong' };
   }
 }
 
@@ -135,7 +138,7 @@ export async function deleteUser(id: string) {
 }
 
 // Category Management
-export async function createCategory(formData: FormData, userId: string) {
+export async function createCategory(userId: string, formData: FormData) {
   const validatedFields = z.object({
     name: z.string().min(1),
     description: z.string(),
@@ -224,7 +227,7 @@ export async function deleteCategory(id: string) {
 }
 
 // Department Management
-export async function createDepartment(formData: FormData, userId: string) {
+export async function createDepartment(userId: string, formData: FormData) {
   const validatedFields = z.object({
     name: z.string().min(1),
     description: z.string(),
@@ -313,7 +316,7 @@ export async function deleteDepartment(id: string) {
 }
 
 // Asset Management
-export async function createAsset(formData: FormData, userId: string) {
+export async function createAsset(userId: string, formData: FormData) {
   const validatedFields = z.object({
     name: z.string().min(1),
     category_id: z.string().min(1),

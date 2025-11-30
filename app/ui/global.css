@@ -49,13 +49,18 @@
   }
 }
 
-/* Apply styles in a separate layer to avoid circular dependency */
-body {
-  background-color: white;
-  color: black;
+/* Input number styles */
+input[type='number'] {
+  -moz-appearance: textfield;
+  appearance: textfield;
 }
 
-.dark body {
-  background-color: #020817;
-  color: white;
+input[type='number']::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
 }

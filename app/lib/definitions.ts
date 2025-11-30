@@ -14,6 +14,7 @@ export type Category = {
   description: string;
   created_by: string; // user_id
   created_at: string;
+  created_by_name?: string;
 };
 
 export type Department = {
@@ -22,6 +23,7 @@ export type Department = {
   description: string;
   created_by: string; // user_id
   created_at: string;
+  created_by_name?: string;
 };
 
 export type Asset = {
@@ -49,6 +51,7 @@ export type AssetWithDetails = {
   created_at: string;
   status: 'active' | 'disposed' | 'maintenance';
   notes?: string;
+  created_by_name?: string;
 };
 
 // For dashboard statistics

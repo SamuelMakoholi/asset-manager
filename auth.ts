@@ -1,6 +1,7 @@
-import NextAuth from 'next-auth';
-import Credentials from 'next-auth/providers/credentials';
-import { authConfig } from './auth.config';
+import type { AuthOptions } from 'next-auth';
+import { JWT } from 'next-auth/jwt';
+import { Session } from 'next-auth';
+import CredentialsProvider from 'next-auth/providers/credentials';
 import { z } from 'zod';
 import type { User } from '@/app/lib/definitions';
 import bcrypt from 'bcrypt';
@@ -18,10 +19,20 @@ async function getUser(email: string): Promise<User | undefined> {
   }
 }
 
-export const { auth, signIn, signOut } = NextAuth({
-  ...authConfig,
+export const authOptions: AuthOptions = {
+  pages: {
+    signIn: '/login',
+  },
+  session: {
+    strategy: 'jwt',
+  },
   providers: [
-    Credentials({
+    CredentialsProvider({
+      name: 'Credentials',
+      credentials: {
+        email: { label: 'Email', type: 'email' },
+        password: { label: 'Password', type: 'password' },
+      },
       async authorize(credentials) {
         const parsedCredentials = z
           .object({ email: z.string().email(), password: z.string().min(6) })
@@ -31,33 +42,33 @@ export const { auth, signIn, signOut } = NextAuth({
           const { email, password } = parsedCredentials.data;
           const user = await getUser(email);
           if (!user) return null;
-          
+
           const passwordsMatch = await bcrypt.compare(password, user.password);
-          
-          if (passwordsMatch) return user;
+
+          if (passwordsMatch) {
+            return user;
+          }
         }
-        
+
         console.log('Invalid credentials');
         return null;
       },
     }),
   ],
   callbacks: {
-    ...authConfig.callbacks,
-    async jwt({ token, user }) {
+    async jwt({ token, user }: { token: JWT; user?: User }) {
       if (user) {
+        token.id = user.id;
         token.role = user.role;
       }
       return token;
     },
-    async session({ session, token }) {
-      if (token.sub && session.user) {
-        session.user.id = token.sub;
-      }
-      if (token.role && session.user) {
+    async session({ session, token }: { session: Session; token: JWT }) {
+      if (session.user) {
+        session.user.id = token.id as string;
         session.user.role = token.role as 'admin' | 'user';
       }
       return session;
     },
   },
-});
+};
