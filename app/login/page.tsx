@@ -7,14 +7,16 @@ import { Package2 } from 'lucide-react';
 
 export default function LoginPage() {
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-background">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-background p-4">
       <div className="mb-8 flex items-center space-x-2">
         <Package2 className="h-8 w-8 text-primary" />
         <h1 className="text-2xl font-bold">Asset Manager</h1>
       </div>
-      <Card className="mx-auto w-full max-w-sm">
+
+      {/* Wider Card with Top Border */}
+      <Card className="mx-auto w-full max-w-lg border-t-4 border-primary shadow-xl">
         <CardHeader>
-          <CardTitle className="text-2xl">Login</CardTitle>
+          <CardTitle className="text-3xl font-bold">Login</CardTitle>
           <CardDescription>
             Enter your credentials to access your account
           </CardDescription>
@@ -37,7 +39,7 @@ export default function LoginPage() {
               </div>
               <Input id="password" name="password" type="password" required />
             </div>
-            <Button type="submit" className="w-full">Login</Button>
+            <Button type="submit" className="w-full h-12 text-base font-semibold">Login</Button>
           </form>
         </CardContent>
       </Card>

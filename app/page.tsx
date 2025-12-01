@@ -1,137 +1,72 @@
-import Image from "next/image";
 import Link from "next/link";
-import { Package2, BarChart3, Users, Building } from "lucide-react";
+import { Package2, ArrowRight, BarChart3, ShieldCheck } from "lucide-react";
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen flex-col bg-white dark:bg-slate-950">
-      {/* Header */}
-      <header className="border-b border-slate-200 dark:border-slate-800">
-        <div className="container mx-auto flex h-16 items-center justify-between px-4">
-          <div className="flex items-center gap-2">
-            <Package2 className="h-6 w-6 text-primary" />
-            <span className="text-xl font-bold">Asset Manager</span>
-          </div>
-          <Link 
-            href="/login" 
-            className="rounded-md bg-primary px-4 py-2 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-          >
-            Login
-          </Link>
-        </div>
-      </header>
+    <div className="relative flex min-h-screen flex-col items-center justify-center overflow-hidden bg-slate-50 selection:bg-primary selection:text-white dark:bg-slate-950">
+      {/* Animated Background Elements */}
+      <div className="absolute inset-0 -z-10 overflow-hidden">
+        <div className="absolute -top-[25%] -left-[10%] h-[500px] w-[500px] animate-pulse rounded-full bg-primary/20 blur-[100px] duration-3000" />
+        <div className="absolute top-[20%] -right-[10%] h-[400px] w-[400px] animate-pulse rounded-full bg-blue-400/20 blur-[100px] duration-5000 delay-1000" />
+        <div className="absolute -bottom-[20%] left-[20%] h-[600px] w-[600px] animate-pulse rounded-full bg-indigo-500/10 blur-[120px] duration-7000 delay-2000" />
 
-      {/* Hero Section */}
-      <section className="bg-gradient-to-b from-white to-slate-50 py-20 dark:from-slate-950 dark:to-slate-900">
-        <div className="container mx-auto px-4">
-          <div className="grid gap-8 md:grid-cols-2 md:gap-12 items-center">
-            <div className="space-y-6">
-              <h1 className="text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl">
-                Manage Your Assets <span className="text-primary">Efficiently</span>
+        {/* Grid Pattern */}
+        <div className="absolute inset-0 bg-[linear-gradient(to_right,#80808012_1px,transparent_1px),linear-gradient(to_bottom,#80808012_1px,transparent_1px)] bg-[size:24px_24px]"></div>
+      </div>
+
+      <div className="container relative px-4 md:px-6">
+        <div className="flex flex-col items-center gap-8 text-center">
+          {/* Logo Icon with Float Animation */}
+          <div className="relative mb-4 animate-[bounce_3s_infinite]">
+            <div className="absolute inset-0 rounded-full bg-primary/20 blur-xl"></div>
+            <div className="relative rounded-2xl bg-gradient-to-br from-primary to-blue-600 p-4 shadow-2xl ring-1 ring-white/20">
+              <Package2 className="h-12 w-12 text-white" />
+            </div>
+          </div>
+
+          {/* Card with Top Border */}
+          <div className="w-full max-w-2xl rounded-2xl bg-white dark:bg-slate-900 shadow-xl p-8 border-t-4 border-primary">
+            {/* Hero Text with Gradient */}
+            <div className="space-y-4">
+              <h1 className="text-4xl font-extrabold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl">
+                <span className="block text-slate-900 dark:text-white">Asset Management</span>
+                <span className="block bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
+                  Reimagined
+                </span>
               </h1>
-              <p className="text-lg text-slate-600 dark:text-slate-400 max-w-md">
-                Track, organize, and optimize your company assets with our comprehensive asset management solution.
+              <p className="mx-auto max-w-[600px] text-lg text-slate-600 dark:text-slate-300 md:text-xl">
+                Streamline your inventory, track equipment lifecycles, and optimize resource allocation with our intelligent platform.
               </p>
-              <div className="flex flex-col sm:flex-row gap-4">
-                <Link 
-                  href="/login" 
-                  className="inline-flex items-center justify-center rounded-md bg-primary px-6 py-3 text-sm font-medium text-primary-foreground hover:bg-primary/90 transition-colors"
-                >
-                  Get Started
-                </Link>
-                <Link 
-                  href="#features" 
-                  className="inline-flex items-center justify-center rounded-md border border-slate-200 bg-white px-6 py-3 text-sm font-medium text-slate-900 hover:bg-slate-50 dark:border-slate-800 dark:bg-slate-950 dark:text-slate-100 dark:hover:bg-slate-900 transition-colors"
-                >
-                  Learn More
-                </Link>
-              </div>
             </div>
-            <div className="relative hidden md:block">
-              <div className="absolute -left-4 -top-4 h-72 w-72 rounded-full bg-primary/10 blur-3xl"></div>
-              <div className="relative z-10 rounded-xl border border-slate-200 bg-white/80 p-6 shadow-lg backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/80">
-                <div className="space-y-4">
-                  <div className="flex items-center gap-4">
-                    <div className="rounded-full bg-primary/10 p-2">
-                      <Package2 className="h-6 w-6 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="font-medium">Total Assets</h3>
-                      <p className="text-2xl font-bold">1,248</p>
-                    </div>
-                  </div>
-                  <div className="h-px bg-slate-200 dark:bg-slate-800"></div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1">
-                        <Building className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm text-slate-500">Departments</span>
-                      </div>
-                      <p className="font-medium">12</p>
-                    </div>
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1">
-                        <Users className="h-4 w-4 text-slate-500" />
-                        <span className="text-sm text-slate-500">Users</span>
-                      </div>
-                      <p className="font-medium">48</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Features Section */}
-      <section id="features" className="py-20">
-        <div className="container mx-auto px-4">
-          <div className="mb-12 text-center">
-            <h2 className="text-3xl font-bold tracking-tight sm:text-4xl">Key Features</h2>
-            <p className="mt-4 text-lg text-slate-600 dark:text-slate-400">Everything you need to manage your assets effectively</p>
-          </div>
-          <div className="grid gap-8 md:grid-cols-3">
-            {/* Feature 1 */}
-            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-              <div className="mb-4 rounded-full bg-primary/10 p-2 w-fit">
-                <Package2 className="h-6 w-6 text-primary" />
+            {/* Stats / Features Pills */}
+            <div className="flex flex-wrap justify-center gap-3 mt-6 animate-in fade-in slide-in-from-bottom-4 duration-1000 fill-mode-forwards">
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white/50 px-4 py-1.5 text-sm font-medium text-slate-600 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
+                <ShieldCheck className="h-4 w-4 text-primary" />
+                Secure Tracking
               </div>
-              <h3 className="mb-2 text-xl font-medium">Asset Tracking</h3>
-              <p className="text-slate-600 dark:text-slate-400">Track all your assets in one place with detailed information and history.</p>
-            </div>
-            {/* Feature 2 */}
-            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-              <div className="mb-4 rounded-full bg-primary/10 p-2 w-fit">
-                <BarChart3 className="h-6 w-6 text-primary" />
+              <div className="flex items-center gap-2 rounded-full border border-slate-200 bg-white/50 px-4 py-1.5 text-sm font-medium text-slate-600 backdrop-blur-sm dark:border-slate-800 dark:bg-slate-900/50 dark:text-slate-300">
+                <BarChart3 className="h-4 w-4 text-primary" />
+                Real-time Analytics
               </div>
-              <h3 className="mb-2 text-xl font-medium">Analytics</h3>
-              <p className="text-slate-600 dark:text-slate-400">Get insights into your asset utilization and make data-driven decisions.</p>
             </div>
-            {/* Feature 3 */}
-            <div className="rounded-lg border border-slate-200 bg-white p-6 shadow-sm dark:border-slate-800 dark:bg-slate-950">
-              <div className="mb-4 rounded-full bg-primary/10 p-2 w-fit">
-                <Users className="h-6 w-6 text-primary" />
-              </div>
-              <h3 className="mb-2 text-xl font-medium">User Management</h3>
-              <p className="text-slate-600 dark:text-slate-400">Assign assets to users and track responsibility with role-based access control.</p>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      {/* Footer */}
-      <footer className="mt-auto border-t border-slate-200 py-6 dark:border-slate-800">
-        <div className="container mx-auto px-4">
-          <div className="flex flex-col items-center justify-between gap-4 sm:flex-row">
-            <div className="flex items-center gap-2">
-              <Package2 className="h-5 w-5 text-primary" />
-              <span className="text-sm font-medium">Asset Manager</span>
+            {/* Call to Action */}
+            <div className="mt-8 flex flex-col gap-3 min-[400px]:flex-row justify-center">
+              <Link
+                href="/login"
+                className="group inline-flex h-12 items-center justify-center gap-2 rounded-full bg-primary px-8 text-sm font-medium text-primary-foreground shadow-lg shadow-primary/25 transition-all hover:bg-primary/90 hover:scale-105 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50"
+              >
+                Get Started
+                <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+              </Link>
             </div>
-            <p className="text-sm text-slate-600 dark:text-slate-400">© 2025 Asset Manager. All rights reserved.</p>
           </div>
         </div>
-      </footer>
+      </div>
+
+      {/* Bottom decoration */}
+      <div className="absolute bottom-0 w-full h-px bg-gradient-to-r from-transparent via-slate-300 to-transparent dark:via-slate-700"></div>
     </div>
   );
 }
