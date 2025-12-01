@@ -5,14 +5,14 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { fetchFilteredAssets } from '@/app/lib/data';
 import { deleteAsset } from '@/app/lib/actions';
-import { getToken } from 'next-auth/jwt';
-import { cookies } from 'next/headers';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/auth';
 
 export default async function AssetsPage({ searchParams }: { searchParams?: { query?: string; page?: string; } }) {
-  const token = await getToken({ req: { cookies: cookies() } as any, secret: process.env.NEXTAUTH_SECRET });
+  const session = await getServerSession(authOptions);
   const query = searchParams?.query || '';
   const currentPage = Number(searchParams?.page) || 1;
-  const assets = await fetchFilteredAssets(query, currentPage, token!.id as string, true);
+  const assets = await fetchFilteredAssets(query, currentPage, session!.user.id as string, true);
 
   return (
     <Card>

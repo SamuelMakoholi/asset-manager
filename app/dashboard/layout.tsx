@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { redirect } from 'next/navigation';
-import { getToken } from 'next-auth/jwt';
-import { cookies } from 'next/headers';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/auth';
 import Link from 'next/link';
 import { CircleUser, Menu, Package2 } from 'lucide-react';
 
@@ -25,13 +25,13 @@ import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import NavLinks from '@/components/nav-links';
 
 export default async function DashboardLayout({ children }: { children: ReactNode }) {
-  const token = await getToken({ req: { cookies: cookies() } as any, secret: process.env.NEXTAUTH_SECRET });
+  const session = await getServerSession(authOptions);
 
-  if (!token) {
+  if (!session || !session.user) {
     redirect('/login');
   }
 
-  const userRole = token.role as 'admin' | 'user';
+  const userRole = session.user.role as 'admin' | 'user';
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">

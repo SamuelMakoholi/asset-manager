@@ -11,7 +11,10 @@ import { User, CategoryForm, DepartmentForm, AssetForm, UserForm } from './defin
 const sql = postgres(process.env.POSTGRES_URL!, { ssl: 'require' });
 
 // Authentication
-export async function authenticate(formData: FormData) {
+export async function authenticate(
+  prevState: { error: string | null; role?: string },
+  formData: FormData,
+): Promise<{ error: string | null; role?: string }> {
   const email = formData.get('email') as string;
   const password = formData.get('password') as string;
 
@@ -20,16 +23,32 @@ export async function authenticate(formData: FormData) {
   }
 
   try {
-    // In server actions, we can't use the client-side signIn function
-    // Instead, we'll redirect to the NextAuth API route
-    redirect(`/api/auth/signin/credentials?email=${encodeURIComponent(email)}&password=${encodeURIComponent(password)}`);
+    // Check if user exists
+    const user = await sql`SELECT * FROM users WHERE email=${email}`;
+    
+    if (user.length === 0) {
+      return { error: 'Invalid email or password' };
+    }
+    
+    // Check password
+    const passwordMatch = await bcrypt.compare(password, user[0].password);
+    
+    if (!passwordMatch) {
+      return { error: 'Invalid email or password' };
+    }
+    
+    // Return user role on successful authentication
+    return { error: null, role: user[0].role };
   } catch (error) {
     if (error instanceof Error) {
+      if (error.message.includes('NEXT_REDIRECT')) {
+        throw error;
+      }
       return { error: error.message };
     }
     return { error: 'Something went wrong' };
   }
-}
+} 
 
 // User Management
 export async function createUser(formData: FormData) {

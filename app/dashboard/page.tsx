@@ -1,11 +1,11 @@
-import { getToken } from 'next-auth/jwt';
-import { cookies } from 'next/headers';
+import { getServerSession } from 'next-auth/next';
+import { authOptions } from '@/auth';
 import { redirect } from 'next/navigation';
 
 export default async function DashboardPage() {
-  const token = await getToken({ req: { cookies: cookies() } as any, secret: process.env.NEXTAUTH_SECRET });
+  const session = await getServerSession(authOptions);
 
-  if (!token) {
+  if (!session) {
     redirect('/login');
   }
 
