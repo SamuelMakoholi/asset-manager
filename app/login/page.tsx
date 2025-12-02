@@ -132,7 +132,7 @@ export default function LoginPage() {
           <Package2 className="h-10 w-10 text-primary animate-pulse" />
           {/* Gradient Text for Title */}
           <h1 className="text-4xl font-extrabold tracking-tight bg-gradient-to-r from-primary to-blue-600 bg-clip-text text-transparent">
-            Asset Manager
+            Asset Manager System
           </h1>
         </div>
         <p className="text-slate-600 dark:text-slate-400 text-lg">Manage your assets efficiently</p>
