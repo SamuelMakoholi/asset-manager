@@ -1,7 +1,7 @@
 "use client";
 
 import { useActionState } from 'react';
-import { createCategory } from '@/app/lib/actions';
+import { createDepartment } from '@/app/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,22 +9,22 @@ import { Label } from '@/components/ui/label';
 import { Textarea } from '@/components/ui/textarea';
 import { useFormStatus } from 'react-dom';
 
-// This component now requires a userId prop
-export default function CreateCategoryPage({ userId }: { userId: string }) {
+export default function CreateDepartmentForm({ userId }: { userId: string }) {
   const initialState: { message: string; errors?: { name?: string[]; description?: string[] } } = { message: '', errors: {} };
 
-  async function action(prevState: typeof initialState, formData: FormData) {
-    return createCategory(userId, formData);
-  }
+  // This wrapper function matches the signature expected by useActionState
+  const clientAction = async (prevState: typeof initialState, formData: FormData) => {
+    // It then calls the original server action with the correct arguments
+    return createDepartment(userId, formData);
+  };
 
-  const [state, formAction] = useActionState(action, initialState);
-
+  const [state, formAction] = useActionState(clientAction, initialState);
   const { pending } = useFormStatus();
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Create Category</CardTitle>
+        <CardTitle>Create Department</CardTitle>
       </CardHeader>
       <CardContent>
         <form action={formAction} className="grid gap-4">
@@ -38,7 +38,7 @@ export default function CreateCategoryPage({ userId }: { userId: string }) {
             <Textarea id="description" name="description" />
             {state.errors?.description && <p className="text-sm text-red-500">{state.errors.description}</p>}
           </div>
-          <Button type="submit" className="w-full" disabled={pending}>Create Category</Button>
+          <Button type="submit" className="w-full" disabled={pending}>Create Department</Button>
         </form>
       </CardContent>
     </Card>
