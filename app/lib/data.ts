@@ -310,7 +310,7 @@ export async function fetchAssetStats(userId: string | null = null, isAdmin: boo
         `;
 
     // Assets by department
-    const byDepartment = isAdmin
+    const byDepartmentRaw = isAdmin
       ? await sql`
           SELECT 
             d.name as department_name,
@@ -332,9 +332,16 @@ export async function fetchAssetStats(userId: string | null = null, isAdmin: boo
           ORDER BY count DESC
           LIMIT 5
         `;
+
+    const byDepartment: { department_name: string; count: number }[] = byDepartmentRaw.map(
+      (row: any) => ({
+        department_name: String(row.department_name),
+        count: Number(row.count ?? 0),
+      }),
+    );
 
     // Assets by category
-    const byCategory = isAdmin
+    const byCategoryRaw = isAdmin
       ? await sql`
           SELECT 
             c.name as category_name,
@@ -357,8 +364,15 @@ export async function fetchAssetStats(userId: string | null = null, isAdmin: boo
           LIMIT 5
         `;
 
+    const byCategory: { category_name: string; count: number }[] = byCategoryRaw.map(
+      (row: any) => ({
+        category_name: String(row.category_name),
+        count: Number(row.count ?? 0),
+      }),
+    );
+
     // Recent assets
-    const recentAssets = isAdmin
+    const recentAssetsRaw = isAdmin
       ? await sql`
           SELECT 
             a.id,
@@ -388,16 +402,22 @@ export async function fetchAssetStats(userId: string | null = null, isAdmin: boo
           ORDER BY a.created_at DESC
           LIMIT 5
         `;
+
+    const recentAssets = (recentAssetsRaw as any[]).map((asset) => ({
+      id: String(asset.id),
+      name: String(asset.name),
+      category_name: String(asset.category_name),
+      department_name: String(asset.department_name),
+      purchase_date: String(asset.purchase_date),
+      cost: Number(asset.cost ?? 0),
+    }));
 
     const stats: AssetStats = {
       total_assets: Number(totals[0].total_assets ?? 0),
       total_value: Number(totals[0].total_value ?? 0),
       assets_by_department: byDepartment,
       assets_by_category: byCategory,
-      recent_assets: recentAssets.map(asset => ({
-        ...asset,
-        cost: Number(asset.cost)
-      }))
+      recent_assets: recentAssets,
     };
 
     return stats;

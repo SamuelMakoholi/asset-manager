@@ -1,6 +1,7 @@
 "use client";
 
-import { useActionState } from 'react';
+import { useActionState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { createAsset } from '@/app/lib/actions';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -11,15 +12,33 @@ import { Textarea } from '@/components/ui/textarea';
 import { useFormStatus } from 'react-dom';
 import { CategoryField, DepartmentField } from '@/app/lib/definitions';
 
-export default function CreateAssetForm({ userId, categories, departments }: { userId: string, categories: CategoryField[], departments: DepartmentField[] }) {
-  const initialState = { message: '', errors: {} };
+type CreateAssetState = {
+  ok?: boolean;
+  message?: string;
+  errors?: Record<string, string[]>;
+};
 
-  const clientAction = async (prevState: typeof initialState, formData: FormData) => {
-    return createAsset(userId, formData);
+export default function CreateAssetForm({ userId, categories, departments }: { userId: string, categories: CategoryField[], departments: DepartmentField[] }) {
+  const router = useRouter();
+  const initialState: CreateAssetState = { message: '', errors: {} };
+
+  const clientAction = async (prevState: CreateAssetState, formData: FormData) => {
+    const result = await createAsset(userId, formData);
+    return result as CreateAssetState;
   };
 
-  const [state, formAction] = useActionState(clientAction, initialState);
+  const [state, formAction] = useActionState<CreateAssetState, FormData>(clientAction, initialState);
   const { pending } = useFormStatus();
+
+  useEffect(() => {
+    if (state?.ok) {
+      // Briefly show success, then go to assets page
+      const timeout = setTimeout(() => {
+        router.push('/dashboard/assets');
+      }, 800);
+      return () => clearTimeout(timeout);
+    }
+  }, [state?.ok, router]);
 
   return (
     <Card>
@@ -27,6 +46,12 @@ export default function CreateAssetForm({ userId, categories, departments }: { u
         <CardTitle>Create Asset</CardTitle>
       </CardHeader>
       <CardContent>
+        {state.ok && state.message && (
+          <p className="mb-2 text-sm text-green-600">{state.message}</p>
+        )}
+        {!state.ok && state.message && (
+          <p className="mb-2 text-sm text-red-600">{state.message}</p>
+        )}
         <form action={formAction} className="grid gap-4">
           <div className="grid gap-2">
             <Label htmlFor="name">Asset Name</Label>
@@ -97,7 +122,9 @@ export default function CreateAssetForm({ userId, categories, departments }: { u
             <Label htmlFor="notes">Notes</Label>
             <Textarea id="notes" name="notes" />
           </div>
-          <Button type="submit" className="w-full" disabled={pending}>Create Asset</Button>
+          <Button type="submit" className="w-full" disabled={pending}>
+            {pending ? 'Creating asset...' : 'Create Asset'}
+          </Button>
         </form>
       </CardContent>
     </Card>

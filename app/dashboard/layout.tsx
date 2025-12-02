@@ -1,5 +1,6 @@
 import { ReactNode } from 'react';
 import Link from 'next/link';
+import { redirect } from 'next/navigation';
 import { CircleUser, Menu, Package2 } from 'lucide-react';
 
 import { Button } from '@/components/ui/button';
@@ -20,9 +21,17 @@ import {
 } from '@/components/ui/dropdown-menu';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import NavLinks from '@/components/nav-links';
+import { getCurrentUser } from '@/app/lib/server-auth';
+import { LogoutItem } from '@/app/components/logout-item';
 
-export default function DashboardLayout({ children }: { children: ReactNode }) {
-  const userRole: 'admin' | 'user' = 'admin';
+export default async function DashboardLayout({ children }: { children: ReactNode }) {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  const userRole: 'admin' | 'user' = user.role;
 
   return (
     <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
@@ -39,7 +48,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <NavLinks userRole={userRole} />
             </nav>
           </div>
-          <div className="mt-auto p-4">
+          {/* <div className="mt-auto p-4">
             <Card>
               <CardHeader className="p-2 pt-0 md:p-4">
                 <CardTitle>Upgrade to Pro</CardTitle>
@@ -53,7 +62,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
                 </Button>
               </CardContent>
             </Card>
-          </div>
+          </div> */}
         </div>
       </div>
       <div className="flex flex-col">
@@ -107,7 +116,7 @@ export default function DashboardLayout({ children }: { children: ReactNode }) {
               <DropdownMenuItem>Settings</DropdownMenuItem>
               <DropdownMenuItem>Support</DropdownMenuItem>
               <DropdownMenuSeparator />
-              <DropdownMenuItem>Logout</DropdownMenuItem>
+              <LogoutItem />
             </DropdownMenuContent>
           </DropdownMenu>
         </header>

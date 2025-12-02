@@ -1,14 +1,19 @@
+import { redirect } from 'next/navigation';
 import CreateAssetForm from './create-form';
 import { fetchCategories, fetchDepartments } from '@/app/lib/data';
+import { getCurrentUser } from '@/app/lib/server-auth';
 
 export default async function CreateAssetPage() {
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
   const [categories, departments] = await Promise.all([
     fetchCategories(),
     fetchDepartments(),
   ]);
 
-  // TODO: replace 'TEMP_USER_ID' with real user id when you add proper auth context
-  const tempUserId = 'TEMP_USER_ID';
-
-  return <CreateAssetForm userId={tempUserId} categories={categories} departments={departments} />;
+  return <CreateAssetForm userId={user.userId} categories={categories} departments={departments} />;
 }

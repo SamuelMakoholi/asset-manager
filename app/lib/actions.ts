@@ -65,6 +65,7 @@ export async function createUser(formData: FormData) {
 
   if (!validatedFields.success) {
     return {
+      ok: false as const,
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create User.',
     };
@@ -78,6 +79,7 @@ export async function createUser(formData: FormData) {
     const existingUser = await sql`SELECT * FROM users WHERE email=${email}`;
     if (existingUser.length > 0) {
       return {
+        ok: false as const,
         message: 'User with this email already exists.',
       };
     }
@@ -88,12 +90,17 @@ export async function createUser(formData: FormData) {
     `;
   } catch (error) {
     return {
+      ok: false as const,
       message: 'Database Error: Failed to Create User.',
     };
   }
 
   revalidatePath('/dashboard/admin/users');
-  redirect('/dashboard/admin/users');
+
+  return {
+    ok: true as const,
+    message: 'User created successfully.',
+  };
 }
 
 export async function updateUser(id: string, formData: FormData) {
@@ -167,6 +174,7 @@ export async function createCategory(userId: string, formData: FormData) {
 
   if (!validatedFields.success) {
     return {
+      ok: false as const,
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Category.',
     };
@@ -182,12 +190,17 @@ export async function createCategory(userId: string, formData: FormData) {
     `;
   } catch (error) {
     return {
+      ok: false as const,
       message: 'Database Error: Failed to Create Category.',
     };
   }
 
   revalidatePath('/dashboard/admin/categories');
-  redirect('/dashboard/admin/categories');
+
+  return {
+    ok: true as const,
+    message: 'Category created successfully.',
+  };
 }
 
 export async function updateCategory(id: string, formData: FormData) {
@@ -256,6 +269,7 @@ export async function createDepartment(userId: string, formData: FormData) {
 
   if (!validatedFields.success) {
     return {
+      ok: false as const,
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Department.',
     };
@@ -271,12 +285,17 @@ export async function createDepartment(userId: string, formData: FormData) {
     `;
   } catch (error) {
     return {
+      ok: false as const,
       message: 'Database Error: Failed to Create Department.',
     };
   }
 
   revalidatePath('/dashboard/admin/departments');
-  redirect('/dashboard/admin/departments');
+
+  return {
+    ok: true as const,
+    message: 'Department created successfully.',
+  };
 }
 
 export async function updateDepartment(id: string, formData: FormData) {
@@ -355,6 +374,7 @@ export async function createAsset(userId: string, formData: FormData) {
 
   if (!validatedFields.success) {
     return {
+      ok: false as const,
       errors: validatedFields.error.flatten().fieldErrors,
       message: 'Missing Fields. Failed to Create Asset.',
     };
@@ -370,12 +390,19 @@ export async function createAsset(userId: string, formData: FormData) {
     `;
   } catch (error) {
     return {
+      ok: false as const,
       message: 'Database Error: Failed to Create Asset.',
     };
   }
 
-  revalidatePath('/dashboard');
-  redirect('/dashboard');
+  // Revalidate assets listings for both user and admin views
+  revalidatePath('/dashboard/assets');
+  revalidatePath('/dashboard/admin/assets');
+
+  return {
+    ok: true as const,
+    message: 'Asset created successfully.',
+  };
 }
 
 export async function updateAsset(id: string, formData: FormData) {

@@ -20,7 +20,9 @@ export default async function EditAssetPage({ params }: { params: { id: string }
     notFound();
   }
 
-  const updateAssetWithId = updateAsset.bind(null, asset.id);
+  async function updateAssetWithId(formData: FormData) {
+    await updateAsset(id, formData);
+  }
 
   return (
     <Card>

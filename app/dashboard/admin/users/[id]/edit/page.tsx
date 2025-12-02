@@ -1,5 +1,5 @@
 import { updateUser } from '@/app/lib/actions';
-import { fetchUserById } from '@/app/lib/data';
+import { getUserById } from '@/app/lib/data';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
@@ -9,13 +9,15 @@ import { notFound } from 'next/navigation';
 
 export default async function EditUserPage({ params }: { params: { id: string } }) {
   const id = params.id;
-  const user = await fetchUserById(id);
+  const user = await getUserById(id);
 
   if (!user) {
     notFound();
   }
 
-  const updateUserWithId = updateUser.bind(null, user.id);
+  async function updateUserWithId(formData: FormData) {
+    await updateUser(id, formData);
+  }
 
   return (
     <Card>

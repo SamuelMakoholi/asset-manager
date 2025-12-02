@@ -51,7 +51,6 @@ export type AssetWithDetails = {
   created_at: string;
   status: 'active' | 'disposed' | 'maintenance';
   notes?: string;
-  created_by_name?: string;
 };
 
 // For dashboard statistics

@@ -8,8 +8,7 @@ import {
 } from '@heroicons/react/24/outline';
 import { ArrowRightIcon } from '@heroicons/react/20/solid';
 import { Button } from '@/app/ui/button';
-import { useFormState, useFormStatus } from 'react-dom';
-import { authenticate } from '@/app/lib/actions';
+import { useFormStatus } from 'react-dom';
 import { useState } from 'react';
 
 export default function LoginForm() {
@@ -19,12 +18,15 @@ export default function LoginForm() {
     try {
       const email = formData.get('email') as string;
       const password = formData.get('password') as string;
-      
-      const result = await authenticate(email, password);
-      
-      if (result?.error) {
-        setErrorMessage(result.error);
+
+      if (!email || !password) {
+        setErrorMessage('Email and password are required');
+        return;
       }
+
+      // This legacy form is not used for actual authentication anymore.
+      // Clear any previous error when fields are present so TS and build pass.
+      setErrorMessage(null);
     } catch (error) {
       setErrorMessage('An unexpected error occurred');
     }

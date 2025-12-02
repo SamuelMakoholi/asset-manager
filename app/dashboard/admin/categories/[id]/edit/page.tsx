@@ -15,7 +15,9 @@ export default async function EditCategoryPage({ params }: { params: { id: strin
     notFound();
   }
 
-  const updateCategoryWithId = updateCategory.bind(null, category.id);
+  async function updateCategoryWithId(formData: FormData) {
+    await updateCategory(id, formData);
+  }
 
   return (
     <Card>

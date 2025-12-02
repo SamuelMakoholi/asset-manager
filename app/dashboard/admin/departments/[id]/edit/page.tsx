@@ -15,7 +15,9 @@ export default async function EditDepartmentPage({ params }: { params: { id: str
     notFound();
   }
 
-  const updateDepartmentWithId = updateDepartment.bind(null, department.id);
+  async function updateDepartmentWithId(formData: FormData) {
+    await updateDepartment(id, formData);
+  }
 
   return (
     <Card>
