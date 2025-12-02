@@ -34,17 +34,17 @@ export default async function DashboardLayout({ children }: { children: ReactNod
   const userRole: 'admin' | 'user' = user.role;
 
   return (
-    <div className="grid min-h-screen w-full md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
-      <div className="hidden border-r bg-muted/40 md:block">
-        <div className="flex h-full max-h-screen flex-col gap-2">
+    <div className="grid min-h-screen w-full bg-muted/20 md:grid-cols-[220px_1fr] lg:grid-cols-[280px_1fr]">
+      <aside className="hidden border-r bg-gradient-to-b from-background to-muted/60 md:block">
+        <div className="flex h-full max-h-screen flex-col gap-3">
           <div className="flex h-14 items-center border-b px-4 lg:h-[60px] lg:px-6">
-            <Link href="/" className="flex items-center gap-2 font-semibold">
-              <Package2 className="h-6 w-6" />
-              <span className="">Asset Manager</span>
+            <Link href="/" className="flex items-center gap-2 font-semibold tracking-tight">
+              <Package2 className="h-6 w-6 text-primary" />
+              <span className="text-sm">Asset Manager</span>
             </Link>
           </div>
-          <div className="flex-1">
-            <nav className="grid items-start px-2 text-sm font-medium lg:px-4">
+          <div className="flex-1 pb-4">
+            <nav className="grid items-start gap-1 px-2 text-sm font-medium lg:px-4">
               <NavLinks userRole={userRole} />
             </nav>
           </div>
@@ -64,9 +64,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </Card>
           </div> */}
         </div>
-      </div>
+      </aside>
       <div className="flex flex-col">
-        <header className="flex h-14 items-center gap-4 border-b bg-muted/40 px-4 lg:h-[60px] lg:px-6">
+        <header className="flex h-14 items-center gap-4 border-b bg-background/80 px-4 backdrop-blur lg:h-[60px] lg:px-6">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" size="icon" className="shrink-0 md:hidden">
@@ -103,6 +103,9 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </SheetContent>
           </Sheet>
           <div className="w-full flex-1" />
+          <span className="hidden text-sm font-medium text-muted-foreground md:inline">
+            {user.name ?? user.email}
+          </span>
           <DropdownMenu>
             <DropdownMenuTrigger asChild>
               <Button variant="secondary" size="icon" className="rounded-full">
@@ -120,7 +123,7 @@ export default async function DashboardLayout({ children }: { children: ReactNod
             </DropdownMenuContent>
           </DropdownMenu>
         </header>
-        <main className="flex flex-1 flex-col gap-4 p-4 lg:gap-6 lg:p-6">
+        <main className="flex flex-1 flex-col gap-4 bg-muted/10 p-4 lg:gap-6 lg:p-6">
           {children}
         </main>
       </div>

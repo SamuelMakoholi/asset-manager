@@ -1,7 +1,17 @@
+import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/app/lib/server-auth';
 import CreateDepartmentForm from './create-form';
 
 export default async function CreateDepartmentPage() {
-  // TODO: replace 'TEMP_ADMIN_ID' with real admin user id when auth context is available
-  const tempAdminId = 'TEMP_ADMIN_ID';
-  return <CreateDepartmentForm userId={tempAdminId} />;
+  const user = await getCurrentUser();
+
+  if (!user) {
+    redirect('/login');
+  }
+
+  if (user.role !== 'admin') {
+    redirect('/dashboard');
+  }
+
+  return <CreateDepartmentForm userId={user.userId} />;
 }

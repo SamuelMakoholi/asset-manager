@@ -28,7 +28,6 @@ export default function CreateAssetForm({ userId, categories, departments }: { u
   };
 
   const [state, formAction] = useActionState<CreateAssetState, FormData>(clientAction, initialState);
-  const { pending } = useFormStatus();
 
   useEffect(() => {
     if (state?.ok) {
@@ -122,11 +121,26 @@ export default function CreateAssetForm({ userId, categories, departments }: { u
             <Label htmlFor="notes">Notes</Label>
             <Textarea id="notes" name="notes" />
           </div>
-          <Button type="submit" className="w-full" disabled={pending}>
-            {pending ? 'Creating asset...' : 'Create Asset'}
-          </Button>
+          <SubmitButton />
         </form>
       </CardContent>
     </Card>
+  );
+}
+
+function SubmitButton() {
+  const { pending } = useFormStatus();
+
+  return (
+    <Button type="submit" className="w-full" disabled={pending}>
+      {pending ? (
+        <span className="flex items-center justify-center gap-2">
+          <span className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+          Saving asset...
+        </span>
+      ) : (
+        'Create Asset'
+      )}
+    </Button>
   );
 }

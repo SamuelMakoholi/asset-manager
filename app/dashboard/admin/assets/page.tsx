@@ -40,7 +40,8 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
         </div>
         <Table>
           <TableHeader>
-            <TableRow>
+            {/* Optional: Add a subtle background to the header row for better visual separation */}
+            <TableRow className="bg-muted/50 hover:bg-muted/60"> 
               <TableHead>Name</TableHead>
               <TableHead>Category</TableHead>
               <TableHead>Department</TableHead>
@@ -52,8 +53,12 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
             </TableRow>
           </TableHeader>
           <TableBody>
-            {assets.map((asset) => (
-              <TableRow key={asset.id}>
+            {/* --- STRIPED TABLE LOGIC APPLIED HERE --- */}
+            {assets.map((asset, index) => (
+              <TableRow 
+                key={asset.id} 
+                className={index % 2 === 1 ? 'bg-muted/30 hover:bg-muted/50' : 'hover:bg-accent/50'} // Apply background to odd rows (1, 3, 5...)
+              >
                 <TableCell className="font-medium">{asset.name}</TableCell>
                 <TableCell>{asset.category_name}</TableCell>
                 <TableCell>{asset.department_name}</TableCell>
@@ -82,6 +87,7 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
                 </TableCell>
               </TableRow>
             ))}
+            {/* --- END OF STRIPED TABLE LOGIC --- */}
           </TableBody>
         </Table>
       </CardContent>

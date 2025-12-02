@@ -1,46 +1,17 @@
-"use client";
+import { redirect } from 'next/navigation';
+import { getCurrentUser } from '@/app/lib/server-auth';
+import CreateCategoryForm from './create-form';
 
-import { useActionState } from 'react';
-import { createCategory } from '@/app/lib/actions';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Textarea } from '@/components/ui/textarea';
-import { useFormStatus } from 'react-dom';
+export default async function CreateCategoryPage() {
+  const user = await getCurrentUser();
 
-// This component now requires a userId prop
-export default function CreateCategoryPage({ userId }: { userId: string }) {
-  const initialState: { message: string; errors?: { name?: string[]; description?: string[] } } = { message: '', errors: {} };
-
-  async function action(prevState: typeof initialState, formData: FormData) {
-    return createCategory(userId, formData);
+  if (!user) {
+    redirect('/login');
   }
 
-  const [state, formAction] = useActionState(action, initialState);
+  if (user.role !== 'admin') {
+    redirect('/dashboard');
+  }
 
-  const { pending } = useFormStatus();
-
-  return (
-    <Card>
-      <CardHeader>
-        <CardTitle>Create Category</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <form action={formAction} className="grid gap-4">
-          <div className="grid gap-2">
-            <Label htmlFor="name">Name</Label>
-            <Input id="name" name="name" required />
-            {state.errors?.name && <p className="text-sm text-red-500">{state.errors.name}</p>}
-          </div>
-          <div className="grid gap-2">
-            <Label htmlFor="description">Description</Label>
-            <Textarea id="description" name="description" />
-            {state.errors?.description && <p className="text-sm text-red-500">{state.errors.description}</p>}
-          </div>
-          <Button type="submit" className="w-full" disabled={pending}>Create Category</Button>
-        </form>
-      </CardContent>
-    </Card>
-  );
+  return <CreateCategoryForm userId={user.userId} />;
 }

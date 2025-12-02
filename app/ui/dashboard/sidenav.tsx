@@ -2,9 +2,10 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import clsx from 'clsx';
 
-// Map of links to display in the side navigation
+// Map of links to display in the side navigation.
+// Note: the Home link's href is adjusted dynamically based on user role.
 const links = [
-  { name: 'Home', href: '/dashboard', icon: HomeIcon },
+  { name: 'Home', href: '/dashboard/admin', icon: HomeIcon },
   { name: 'Assets', href: '/dashboard/assets', icon: DocumentIcon },
   { name: 'Categories', href: '/dashboard/categories', icon: FolderIcon },
   { name: 'Users', href: '/dashboard/users', icon: UserGroupIcon, adminOnly: true },
@@ -29,15 +30,19 @@ export default function SideNav({ userRole }: { userRole: string }) {
         {links.map((link) => {
           // Don't show admin links to non-admin users
           if (link.adminOnly && !isAdmin) return null;
-          
+          const targetHref =
+            link.name === 'Home'
+              ? (isAdmin ? '/dashboard/admin' : '/dashboard/admin')
+              : link.href;
+
           return (
             <Link
               key={link.name}
-              href={link.href}
+              href={targetHref}
               className={clsx(
                 'flex h-[48px] grow items-center justify-center gap-2 rounded-md bg-gray-50 p-3 text-sm font-medium hover:bg-sky-100 hover:text-blue-600 md:flex-none md:justify-start md:p-2 md:px-3',
                 {
-                  'bg-sky-100 text-blue-600': pathname === link.href,
+                  'bg-sky-100 text-blue-600': pathname === targetHref,
                 },
               )}
             >
