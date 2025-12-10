@@ -61,6 +61,11 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
                 <TableCell>{asset.status}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+                    <Button asChild variant="secondary" size="sm">
+                      <Link href={`/dashboard/assets/${asset.id}`}>
+                        View
+                      </Link>
+                    </Button>
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/dashboard/assets/${asset.id}/edit`}>
                         Edit

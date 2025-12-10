@@ -455,6 +455,59 @@ export async function updateAsset(id: string, formData: FormData) {
   redirect('/dashboard');
 }
 
+export async function registerAssetWarranty(id: string) {
+  try {
+    const assetRows = await sql`
+      SELECT id, name FROM assets WHERE id = ${id}
+    `;
+
+    if (assetRows.length === 0) {
+      return {
+        ok: false as const,
+        message: 'Asset not found.',
+      };
+    }
+
+    const asset = assetRows[0] as { id: string; name: string };
+
+    const response = await fetch('https://server28.eport.ws/api/warranty/register/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        external_id: asset.id,
+        name: asset.name,
+        serial_number: 'N/A',
+        owner: 'N/A',
+      }),
+    });
+
+    if (!response.ok) {
+      return {
+        ok: false as const,
+        message: 'Failed to register warranty.',
+      };
+    }
+
+    const data = await response.json();
+
+    if (data?.status === 'success') {
+      redirect(`/dashboard/assets/${id}?warranty=success`);
+    }
+
+    return {
+      ok: false as const,
+      message: data?.message ?? 'Warranty registration failed.',
+    };
+  } catch (error) {
+    return {
+      ok: false as const,
+      message: 'Error registering warranty.',
+    };
+  }
+}
+
 export async function deleteAsset(id: string) {
   try {
     await sql`DELETE FROM assets WHERE id = ${id}`;
