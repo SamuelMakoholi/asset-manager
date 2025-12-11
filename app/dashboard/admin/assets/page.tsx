@@ -8,7 +8,8 @@ import { fetchFilteredAssets } from '@/app/lib/data';
 import { deleteAsset } from '@/app/lib/actions';
 import { getCurrentUser } from '@/app/lib/server-auth';
 
-export default async function AssetsPage({ searchParams }: { searchParams?: { query?: string; page?: string; } }) {
+export default async function AssetsPage({ searchParams }: { searchParams: Promise<{ query?: string; page?: string; warranty?: string; message?: string; }> }) {
+
   const user = await getCurrentUser();
 
   if (!user) {
@@ -19,8 +20,13 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
     redirect('/dashboard');
   }
 
-  const query = searchParams?.query || '';
-  const currentPage = Number(searchParams?.page) || 1;
+  const params = await searchParams;
+  const query = params.query ?? '';
+  const currentPage = Number(params.page ?? '1') || 1;
+
+  const warrantyStatus = params.warranty;
+  const warrantyMessage = params.message ? decodeURIComponent(params.message) : undefined;
+
   const assets = await fetchFilteredAssets(query, currentPage, null, true);
 
   return (
@@ -30,6 +36,17 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
         <CardDescription>Manage all company assets.</CardDescription>
       </CardHeader>
       <CardContent>
+        {warrantyMessage && (
+          <div
+            className={
+              warrantyStatus === 'success'
+                ? 'mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800'
+                : 'mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'
+            }
+          >
+            {warrantyMessage}
+          </div>
+        )}
         <div className="flex justify-end mb-4">
           <Button asChild>
             <Link href="/dashboard/assets/create">
@@ -72,6 +89,11 @@ export default async function AssetsPage({ searchParams }: { searchParams?: { qu
                 <TableCell>{asset.status}</TableCell>
                 <TableCell>
                   <div className="flex gap-2">
+                    <Button asChild variant="secondary" size="sm">
+                      <Link href={`/dashboard/admin/assets/${asset.id}`}>
+                        View
+                      </Link>
+                    </Button>
                     <Button asChild variant="outline" size="sm">
                       <Link href={`/dashboard/assets/${asset.id}/edit`}>
                         Edit

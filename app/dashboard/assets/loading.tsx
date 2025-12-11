@@ -8,9 +8,8 @@ export default function UserAssetsLoading() {
         <CardTitle>
           <Skeleton className="h-6 w-32" />
         </CardTitle>
-        <CardDescription>
-          <Skeleton className="mt-2 h-4 w-56" />
-        </CardDescription>
+        {/* Use simple text here to avoid putting a div inside the CardDescription <p> */}
+        <CardDescription>Loading your assets...</CardDescription>
       </CardHeader>
       <CardContent>
         <div className="mb-4 flex justify-end">

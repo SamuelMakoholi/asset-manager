@@ -18,7 +18,14 @@ type CreateAssetState = {
   errors?: Record<string, string[]>;
 };
 
-export default function CreateAssetForm({ userId, categories, departments }: { userId: string, categories: CategoryField[], departments: DepartmentField[] }) {
+type CreateAssetFormProps = {
+  userId: string;
+  userRole: 'admin' | 'user';
+  categories: CategoryField[];
+  departments: DepartmentField[];
+};
+
+export default function CreateAssetForm({ userId, userRole, categories, departments }: CreateAssetFormProps) {
   const router = useRouter();
   const initialState: CreateAssetState = { message: '', errors: {} };
 
@@ -31,13 +38,17 @@ export default function CreateAssetForm({ userId, categories, departments }: { u
 
   useEffect(() => {
     if (state?.ok) {
-      // Briefly show success, then go to assets page
+      // Briefly show success, then go to the appropriate assets page
       const timeout = setTimeout(() => {
-        router.push('/dashboard/assets');
+        if (userRole === 'admin') {
+          router.push('/dashboard/admin/assets');
+        } else {
+          router.push('/dashboard/assets');
+        }
       }, 800);
       return () => clearTimeout(timeout);
     }
-  }, [state?.ok, router]);
+  }, [state?.ok, router, userRole]);
 
   return (
     <Card>

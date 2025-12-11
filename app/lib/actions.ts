@@ -455,8 +455,16 @@ export async function updateAsset(id: string, formData: FormData) {
   redirect('/dashboard');
 }
 
-export async function registerAssetWarranty(id: string) {
+export async function registerAssetWarranty(id: string, ownerName: string, redirectPath: string) {
   try {
+    const apiUsername = process.env.WARRANTY_API_USERNAME;
+    const apiPassword = process.env.WARRANTY_API_PASSWORD;
+
+    if (!apiUsername || !apiPassword) {
+      const message = 'Warranty API credentials (WARRANTY_API_USERNAME / WARRANTY_API_PASSWORD) are not configured.';
+      console.error(message);
+      redirect(`${redirectPath}?warranty=error&message=${encodeURIComponent(message)}`);
+    }
     const assetRows = await sql`
       SELECT id, name FROM assets WHERE id = ${id}
     `;
@@ -470,42 +478,130 @@ export async function registerAssetWarranty(id: string) {
 
     const asset = assetRows[0] as { id: string; name: string };
 
-    const response = await fetch('https://server28.eport.ws/api/warranty/register/', {
+    const payload = {
+      external_id: asset.id,
+      name: asset.name,
+      serial_number: 'N/A',
+      owner: ownerName,
+    };
+
+    // 1) Obtain a fresh access token from Django
+    const tokenResponse = await fetch('https://server28.eport.ws/api/token/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        external_id: asset.id,
-        name: asset.name,
-        serial_number: 'N/A',
-        owner: 'N/A',
+        username: apiUsername,
+        password: apiPassword,
       }),
     });
 
-    if (!response.ok) {
-      return {
-        ok: false as const,
-        message: 'Failed to register warranty.',
-      };
+    if (!tokenResponse.ok) {
+      const tokenData = await tokenResponse.json().catch(() => null);
+      const tokenMessage =
+        (tokenData && (tokenData.detail || tokenData.error || tokenData.message)) ||
+        'Failed to obtain warranty API token.';
+      console.error('Warranty token error:', { status: tokenResponse.status, body: tokenData });
+      redirect(`${redirectPath}?warranty=error&message=${encodeURIComponent(tokenMessage)}`);
     }
 
-    const data = await response.json();
-
-    if (data?.status === 'success') {
-      redirect(`/dashboard/assets/${id}?warranty=success`);
+    const tokenJson = await tokenResponse.json().catch(() => null);
+    const apiToken = tokenJson?.access as string | undefined;
+    if (!apiToken) {
+      const tokenMessage = 'Warranty API token response did not include an access token.';
+      console.error('Warranty token parse error:', tokenJson);
+      redirect(`${redirectPath}?warranty=error&message=${encodeURIComponent(tokenMessage)}`);
     }
 
-    return {
-      ok: false as const,
-      message: data?.message ?? 'Warranty registration failed.',
-    };
+    // 2) Call the warranty registration endpoint with the fresh token
+    const response = await fetch('https://server28.eport.ws/api/warranty/register/', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: `Bearer ${apiToken}`,
+      },
+      body: JSON.stringify(payload),
+    });
+
+    const data = await response.json().catch(() => null);
+    console.log('Warranty API response:', {
+      status: response.status,
+      ok: response.ok,
+      body: data,
+    });
+
+    const apiMessage =
+      (data && (data.message || data.detail || data.error)) ||
+      (!response.ok ? 'Failed to register warranty.' : 'Warranty registered successfully.');
+
+    if (response.ok && (data?.status === 'success' || !('status' in (data || {})))) {
+      redirect(`${redirectPath}?warranty=success&message=${encodeURIComponent(apiMessage)}`);
+    }
+
+    // Non-2xx or explicit failure
+    redirect(`${redirectPath}?warranty=error&message=${encodeURIComponent(apiMessage)}`);
   } catch (error) {
-    return {
-      ok: false as const,
-      message: 'Error registering warranty.',
-    };
+    // Allow Next.js redirect errors to bubble up untouched
+    if (error instanceof Error && error.message.includes('NEXT_REDIRECT')) {
+      throw error;
+    }
+
+    const message =
+      (error instanceof Error && error.message) || 'Error registering warranty.';
+    redirect(`${redirectPath}?warranty=error&message=${encodeURIComponent(message)}`);
   }
+}
+
+export async function fetchWarrantyList() {
+  const apiUsername = process.env.WARRANTY_API_USERNAME;
+  const apiPassword = process.env.WARRANTY_API_PASSWORD;
+
+  if (!apiUsername || !apiPassword) {
+    throw new Error('Warranty API credentials (WARRANTY_API_USERNAME / WARRANTY_API_PASSWORD) are not configured.');
+  }
+
+  // Obtain fresh token
+  const tokenResponse = await fetch('https://server28.eport.ws/api/token/', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ username: apiUsername, password: apiPassword }),
+  });
+
+  if (!tokenResponse.ok) {
+    const tokenData = await tokenResponse.json().catch(() => null);
+    console.error('Warranty token error (list):', { status: tokenResponse.status, body: tokenData });
+    throw new Error('Failed to obtain warranty API token.');
+  }
+
+  const tokenJson = await tokenResponse.json().catch(() => null);
+  const apiToken = tokenJson?.access as string | undefined;
+  if (!apiToken) {
+    console.error('Warranty token parse error (list):', tokenJson);
+    throw new Error('Warranty API token response did not include an access token.');
+  }
+
+  // Call warranty list endpoint
+  const response = await fetch('https://server28.eport.ws/api/warranty/list/', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+      Authorization: `Bearer ${apiToken}`,
+    },
+  });
+
+  const data = await response.json().catch(() => null);
+  console.log('Warranty list API response:', {
+    status: response.status,
+    ok: response.ok,
+    body: data,
+  });
+
+  if (!response.ok) {
+    throw new Error('Failed to fetch warranty list.');
+  }
+
+  return data;
 }
 
 export async function deleteAsset(id: string) {

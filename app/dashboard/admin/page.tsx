@@ -1,11 +1,14 @@
 import { fetchAssetStats } from '@/app/lib/data';
+import { fetchWarrantyList } from '@/app/lib/actions';
+
 import { getCurrentUser } from '@/app/lib/server-auth';
 import { redirect } from 'next/navigation';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
 import { formatCurrency } from '@/app/lib/utils';
 // --- Add Icon Imports ---
-import { HardHat, DollarSign, Users, LayoutDashboard } from 'lucide-react'; 
+import { HardHat, DollarSign, Users, LayoutDashboard, ShieldCheck } from 'lucide-react'; 
 // --- End Icon Imports ---
 
 export default async function AdminDashboardPage() {
@@ -20,6 +23,19 @@ export default async function AdminDashboardPage() {
   }
 
   const stats = await fetchAssetStats(null, true);
+
+  // Fetch warranty list from external API to compute how many assets have registered warranties
+  let warrantyAssetCount = 0;
+  try {
+    const warrantyList = await fetchWarrantyList();
+    if (Array.isArray(warrantyList)) {
+      warrantyAssetCount = warrantyList.length;
+    } else if (Array.isArray((warrantyList as any)?.results)) {
+      warrantyAssetCount = (warrantyList as any).results.length;
+    }
+  } catch (error) {
+    console.error('Failed to fetch warranty list for admin dashboard:', error);
+  }
 
   // Helper component for enhanced metric cards (using the existing stats)
   const MetricCard = ({ title, value, icon: Icon }: {
@@ -54,7 +70,7 @@ export default async function AdminDashboardPage() {
         </h1>
       </header>
 
-      {/* --- Key Metrics (Total Assets & Value) --- */}
+      {/* --- Key Metrics (Total Assets, Value, and Warranty Count) --- */}
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
         {/* We only have two original metrics, so we'll use a 2-column layout for them */}
         <MetricCard 
@@ -66,6 +82,11 @@ export default async function AdminDashboardPage() {
           title="Total Asset Value" 
           value={formatCurrency(stats.total_value)} 
           icon={DollarSign} 
+        />
+        <MetricCard
+          title="Assets with Warranty"
+          value={warrantyAssetCount.toString()}
+          icon={ShieldCheck}
         />
         {/* Summary card using existing stats */}
         <Card className="col-span-2">

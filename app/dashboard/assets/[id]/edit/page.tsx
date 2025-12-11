@@ -8,8 +8,9 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/components/ui/textarea';
 import { notFound } from 'next/navigation';
 
-export default async function EditAssetPage({ params }: { params: { id: string } }) {
-  const id = params.id;
+export default async function EditAssetPage({ params }: { params: Promise<{ id: string }> }) {
+  const resolvedParams = await params;
+  const id = resolvedParams.id;
   const [asset, categories, departments] = await Promise.all([
     fetchAssetById(id),
     fetchCategoryFields(),
@@ -21,6 +22,7 @@ export default async function EditAssetPage({ params }: { params: { id: string }
   }
 
   async function updateAssetWithId(formData: FormData) {
+    'use server';
     await updateAsset(id, formData);
   }
 

@@ -8,15 +8,16 @@ import { fetchFilteredAssets } from '@/app/lib/data';
 import { deleteAsset } from '@/app/lib/actions';
 import { getCurrentUser } from '@/app/lib/server-auth';
 
-export default async function AssetsPage({ searchParams }: { searchParams?: { query?: string; page?: string; } }) {
+export default async function AssetsPage({ searchParams }: { searchParams: Promise<{ query?: string; page?: string; }> }) {
   const user = await getCurrentUser();
 
   if (!user) {
     redirect('/login');
   }
 
-  const query = searchParams?.query || '';
-  const currentPage = Number(searchParams?.page) || 1;
+  const params = await searchParams;
+  const query = params.query ?? '';
+  const currentPage = Number(params.page ?? '1') || 1;
   const assets = await fetchFilteredAssets(query, currentPage, user.userId, false);
 
   return (

@@ -15,5 +15,12 @@ export default async function CreateAssetPage() {
     fetchDepartments(),
   ]);
 
-  return <CreateAssetForm userId={user.userId} categories={categories} departments={departments} />;
+  return (
+    <CreateAssetForm
+      userId={user.userId}
+      userRole={user.role}
+      categories={categories}
+      departments={departments}
+    />
+  );
 }

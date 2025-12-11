@@ -10,9 +10,8 @@ export default function DashboardLoading() {
             <CardTitle>
               <Skeleton className="h-5 w-28" />
             </CardTitle>
-            <CardDescription>
-              <Skeleton className="h-4 w-40" />
-            </CardDescription>
+            {/* Use simple text here to avoid putting a div inside the CardDescription <p> */}
+            <CardDescription>Loading dashboard...</CardDescription>
           </CardHeader>
           <CardContent>
             <Skeleton className="h-8 w-24" />
