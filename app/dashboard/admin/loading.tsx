@@ -10,9 +10,7 @@ export default function AdminDashboardLoading() {
             <CardTitle className="text-sm font-medium text-muted-foreground">
               <Skeleton className="h-4 w-24" />
             </CardTitle>
-            <CardDescription>
-              <Skeleton className="h-6 w-16" />
-            </CardDescription>
+            <CardDescription>Loading overview...</CardDescription>
           </CardHeader>
           <CardContent>
             <Skeleton className="h-8 w-24" />
