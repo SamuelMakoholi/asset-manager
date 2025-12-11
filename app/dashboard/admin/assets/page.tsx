@@ -7,6 +7,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@
 import { fetchFilteredAssets } from '@/app/lib/data';
 import { deleteAsset } from '@/app/lib/actions';
 import { getCurrentUser } from '@/app/lib/server-auth';
+import WarrantyMessageBanner from '@/app/components/warranty-message-banner';
 
 export default async function AssetsPage({ searchParams }: { searchParams: Promise<{ query?: string; page?: string; warranty?: string; message?: string; }> }) {
 
@@ -36,17 +37,7 @@ export default async function AssetsPage({ searchParams }: { searchParams: Promi
         <CardDescription>Manage all company assets.</CardDescription>
       </CardHeader>
       <CardContent>
-        {warrantyMessage && (
-          <div
-            className={
-              warrantyStatus === 'success'
-                ? 'mb-4 rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800'
-                : 'mb-4 rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'
-            }
-          >
-            {warrantyMessage}
-          </div>
-        )}
+        <WarrantyMessageBanner status={warrantyStatus as 'success' | 'error' | undefined} message={warrantyMessage} />
         <div className="flex justify-end mb-4">
           <Button asChild>
             <Link href="/dashboard/assets/create">

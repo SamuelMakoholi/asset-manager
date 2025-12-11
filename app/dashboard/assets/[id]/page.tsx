@@ -7,6 +7,7 @@ import { fetchAssetWithDetails } from '@/app/lib/data';
 import { getCurrentUser } from '@/app/lib/server-auth';
 import { registerAssetWarranty, fetchWarrantyList } from '@/app/lib/actions';
 import { RegisterWarrantyButton } from './register-warranty-button';
+import WarrantyMessageBanner from '@/app/components/warranty-message-banner';
 
 export default async function AssetDetailPage({
   params,
@@ -82,17 +83,7 @@ export default async function AssetDetailPage({
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {warrantyMessage && (
-          <div
-            className={
-              warrantyRegistered
-                ? 'rounded-md border border-green-200 bg-green-50 px-3 py-2 text-sm text-green-800'
-                : 'rounded-md border border-red-200 bg-red-50 px-3 py-2 text-sm text-red-800'
-            }
-          >
-            {warrantyMessage}
-          </div>
-        )}
+        <WarrantyMessageBanner status={warrantyStatus as 'success' | 'error' | undefined} message={warrantyMessage} />
         <div>
           <p className="font-semibold">Name:</p>
           <p>{asset.name}</p>
